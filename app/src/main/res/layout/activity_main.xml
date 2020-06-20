@@ -19,11 +19,85 @@
 
     <ImageView
         android:id="@+id/avatar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toStartOf="@+id/nickname"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/fui_ic_googleg_color_24dp" />
+        app:srcCompat="@drawable/avatar_0" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/avatar">
+
+        <ImageView
+            android:id="@+id/avatar_0"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/avatar_0" />
+
+        <ImageView
+            android:id="@+id/avatar_1"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toEndOf="@+id/avatar_0"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/avatar_1" />
+
+        <ImageView
+            android:id="@+id/avatar_2"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toEndOf="@+id/avatar_1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/avatar_2" />
+
+        <ImageView
+            android:id="@+id/avatar_3"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toEndOf="@+id/avatar_2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/avatar_3" />
+
+        <ImageView
+            android:id="@+id/avatar_4"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toEndOf="@+id/avatar_3"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/avatar_4" />
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_avatars"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="avatar_0,avatar_1,avatar_2,avatar_3,avatar_4"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_input_add" />
 </androidx.constraintlayout.widget.ConstraintLayout>
