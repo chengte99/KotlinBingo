@@ -1,6 +1,7 @@
 package com.chengte99.kotlinbingo
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -17,10 +18,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.room_row.view.*
 import java.util.*
@@ -75,8 +73,25 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, View.O
                     FirebaseDatabase.getInstance()
                         .getReference("rooms")
                         .push()
-                        .setValue(room)
+                        .setValue(room, object : DatabaseReference.CompletionListener {
+                            override fun onComplete(error: DatabaseError?, ref: DatabaseReference) {
+                                if (error == null) {
+                                    val roomID = ref.key
+                                    FirebaseDatabase.getInstance().getReference("rooms")
+                                        .child(roomID!!)
+                                        .child("id")
+                                        .setValue(roomID!!)
+
+                                    val bingo =
+                                        Intent(this@MainActivity, BingoActivity::class.java)
+                                    bingo.putExtra("ROOMID", roomID)
+                                    bingo.putExtra("IS_CREATOR", true)
+                                    startActivity(bingo)
+                                }
+                            }
+                        })
                 }
+                .setNeutralButton("Cancel", null)
                 .show()
         }
 
@@ -97,6 +112,13 @@ class MainActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, View.O
             override fun onBindViewHolder(holder: RoomViewHolder, position: Int, model: GameRoom) {
                 holder.roomAvatar.setImageResource(avatarIds[model.init!!.avatar])
                 holder.roomTitle.setText(model.title)
+                holder.itemView.setOnClickListener(object : View.OnClickListener {
+                    override fun onClick(v: View?) {
+                        val bingo = Intent(this@MainActivity, BingoActivity::class.java)
+                        bingo.putExtra("ROOMID", model.id)
+                        startActivity(bingo)
+                    }
+                })
             }
         }
         recycler.adapter = adapter
