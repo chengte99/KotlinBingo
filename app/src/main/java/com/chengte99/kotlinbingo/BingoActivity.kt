@@ -1,10 +1,12 @@
 package com.chengte99.kotlinbingo
 
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.common.ChangeEventType
@@ -63,8 +65,43 @@ class BingoActivity : AppCompatActivity(), View.OnClickListener {
                 STATUS_JOINER_TURN -> {
                     myTurn = !is_creator
                 }
+                STATUS_CREATOR_BINGO -> {
+                    AlertDialog.Builder(this@BingoActivity)
+                        .setTitle("Bingo")
+                        .setMessage(if (is_creator) "你Bingo了" else "對手Bingo了")
+                        .setPositiveButton("OK", object : DialogInterface.OnClickListener {
+                            override fun onClick(dialog: DialogInterface?, which: Int) {
+                                endGame()
+                            }
+                        })
+                        .show()
+                }
+                STATUS_JOINER_BINGO -> {
+                    AlertDialog.Builder(this@BingoActivity)
+                        .setTitle("Bingo")
+                        .setMessage(if (!is_creator) "你Bingo了" else "對手Bingo了")
+                        .setPositiveButton("OK", object : DialogInterface.OnClickListener {
+                            override fun onClick(dialog: DialogInterface?, which: Int) {
+                                endGame()
+                            }
+                        })
+                        .show()
+                }
             }
         }
+    }
+
+    private fun endGame() {
+        FirebaseDatabase.getInstance().getReference("rooms")
+            .child(roomID)
+            .child("status")
+            .removeEventListener(statusListener)
+        if (is_creator) {
+            FirebaseDatabase.getInstance().getReference("rooms")
+                .child(roomID)
+                .removeValue()
+        }
+        finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -166,6 +203,12 @@ class BingoActivity : AppCompatActivity(), View.OnClickListener {
                         bingo += if (sum == 5) 1 else 0
                     }
                     Log.d(TAG, "onChildChanged: bingo: $bingo")
+                    if (bingo > 0) {
+                        FirebaseDatabase.getInstance().getReference("rooms")
+                            .child(roomID)
+                            .child("status")
+                            .setValue(if (is_creator) STATUS_CREATOR_BINGO else STATUS_JOINER_BINGO)
+                    }
                 }
             }
         }
