@@ -32,6 +32,12 @@ class BingoActivity : AppCompatActivity(), View.OnClickListener {
         val STATUS_CREATOR_BINGO: Int = 5
         val STATUS_JOINER_BINGO: Int = 6
     }
+    var myTurn: Boolean = false
+    set(value) {
+        field = value
+        info.text = if (value) "請選號" else "等待對手選號中"
+    }
+
     val statusListener: ValueEventListener = object : ValueEventListener {
         override fun onCancelled(error: DatabaseError) {
 
@@ -52,7 +58,10 @@ class BingoActivity : AppCompatActivity(), View.OnClickListener {
                         .setValue(STATUS_CREATOR_TURN)
                 }
                 STATUS_CREATOR_TURN -> {
-                    info.text = if (is_creator) "請選號" else "等待對手選號"
+                    myTurn = is_creator
+                }
+                STATUS_JOINER_TURN -> {
+                    myTurn = !is_creator
                 }
             }
         }
@@ -138,6 +147,25 @@ class BingoActivity : AppCompatActivity(), View.OnClickListener {
                     val holder: BingoViewHolder =
                         recycler.findViewHolderForAdapterPosition(pos) as BingoViewHolder
                     holder.numberButton.isEnabled = !is_picked
+                    // bingo check
+                    var nums = IntArray(25)
+                    for (i in 0..24) {
+                        nums[i] = if (buttons.get(i).is_picked) 1 else 0
+                    }
+                    var bingo = 0
+                    for (i in 0..4) {
+                        var sum = 0
+                        for (j in 0..4) {
+                            sum += nums[i*5 + j]
+                        }
+                        bingo += if (sum == 5) 1 else 0
+                        sum = 0
+                        for (j in 0..4) {
+                            sum += nums[j*5 + i]
+                        }
+                        bingo += if (sum == 5) 1 else 0
+                    }
+                    Log.d(TAG, "onChildChanged: bingo: $bingo")
                 }
             }
         }
@@ -167,11 +195,17 @@ class BingoActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onClick(view: View?) {
-        val number = (view as NumberButton).number
-        FirebaseDatabase.getInstance().getReference("rooms")
-            .child(roomID)
-            .child("numbers")
-            .child(number.toString())
-            .setValue(true)
+        if (myTurn) {
+            val number = (view as NumberButton).number
+            FirebaseDatabase.getInstance().getReference("rooms")
+                .child(roomID)
+                .child("numbers")
+                .child(number.toString())
+                .setValue(true)
+            FirebaseDatabase.getInstance().getReference("rooms")
+                .child(roomID)
+                .child("status")
+                .setValue(if (is_creator) STATUS_JOINER_TURN else STATUS_CREATOR_TURN)
+        }
     }
 }
